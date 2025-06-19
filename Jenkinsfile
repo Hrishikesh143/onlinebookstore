@@ -1,45 +1,57 @@
-pipeline {  
+pipeline {
     agent any
-	tools {
-        // Use the Maven and JDK tool names you configured in Jenkins Global Tool Configuration
+    tools {
         maven 'Maven'   // Replace with your Maven name
-        jdk 'Java'      // Replace with your JDK name if available, else set JAVA_HOME as env
-    }  
-        stages {  
-       	    stage("git_checkout") {  
-           	    steps {  
-              	    echo "cloning repository" 
-              	    echo "repo cloned successfully"  
-              	    }  
-         	    }
-           stage("build") {
+        jdk 'Java'      // Replace with your JDK name if available
+    }
+    stages {
+        stage("git_checkout") {
+            steps {
+                echo "cloning repository"
+                echo "repo cloned successfully"
+            }
+        }
+        stage("build") {
             steps {
                 echo "Building with Maven"
-                sh 'mvn clean install'  // Runs the Maven build
+                sh 'mvn clean install'
             }
-  	   }
+        }
         stage("docker_build") {
             steps {
-                echo "Building Docker image"
-                // Build Docker image, tag it
-                sh 'docker build -t my-java-app:latest .'
+                script {
+                    def proceed = input message: 'Do you want to build the Docker image?', parameters: [booleanParam(defaultValue: true, description: '', name: 'Proceed?')]
+                    if (proceed) {
+                        echo "Building Docker image"
+                        sh 'docker build -t my-java-app:latest .'
+                    } else {
+                        echo "Skipping Docker build stage"
+                    }
+                }
             }
- 	}
+        }
         stage("docker_run") {
             steps {
-                echo "Running Docker container"
-                // Stop and remove any existing container with same name
-                sh '''
-                docker run -d -p 8000:8080 --name my-java-container my-java-app:latest
-                '''
+                script {
+                    def proceed = input message: 'Do you want to run the Docker container?', parameters: [booleanParam(defaultValue: true, description: '', name: 'Proceed?')]
+                    if (proceed) {
+                        echo "Running Docker container"
+                        sh '''
+                            docker run -d -p 8000:8080 --name my-java-container my-java-app:latest
+                        '''
+                    } else {
+                        echo "Skipping Docker run stage"
+                    }
+                }
             }
         }
         stage('Kubernetes') {
             steps {
                 sh 'kubectl apply -f k8s/namespace.yaml'
- 		sh 'kubectl apply -f k8s/deployment.yaml'
+                sh 'kubectl apply -f k8s/deployment.yaml'
                 sh 'kubectl apply -f k8s/service.yaml'
             }
         }
-	}
+    }
 }
+
