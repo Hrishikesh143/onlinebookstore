@@ -30,7 +30,6 @@ pipeline {
                 echo "Running Docker container"
                 // Stop and remove any existing container with same name
                 sh '''
-                docker rm -f my-java-container || true
                 docker run -d -p 8080:8080 --name my-java-container my-java-app:latest
                 '''
             }
