@@ -11,5 +11,5 @@ COPY target/onlinebookstore.war .
 EXPOSE 8080
 
 # Run the jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "onlinebookstore.war"]
 
