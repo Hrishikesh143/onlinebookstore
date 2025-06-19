@@ -20,12 +20,16 @@ pipeline {
         stage("docker_build") {
             steps {
                 script {
-                    def proceed = input message: 'Do you want to build the Docker image?', parameters: [booleanParam(defaultValue: true, description: '', name: 'Proceed?')]
-                    if (proceed) {
-                        echo "Building Docker image"
-                        sh 'docker build -t my-java-app:latest .'
-                    } else {
-                        echo "Skipping Docker build stage"
+                    try {
+                        def proceed = input message: 'Do you want to build the Docker image?', parameters: [booleanParam(defaultValue: true, description: '', name: 'Proceed?')]
+                        if (proceed) {
+                            echo "Building Docker image"
+                            sh 'docker build -t my-java-app:latest .'
+                        } else {
+                            echo "Skipping Docker build stage"
+                        }
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                        echo "Input aborted, skipping Docker build stage"
                     }
                 }
             }
@@ -33,14 +37,18 @@ pipeline {
         stage("docker_run") {
             steps {
                 script {
-                    def proceed = input message: 'Do you want to run the Docker container?', parameters: [booleanParam(defaultValue: true, description: '', name: 'Proceed?')]
-                    if (proceed) {
-                        echo "Running Docker container"
-                        sh '''
-                            docker run -d -p 8000:8080 --name my-java-container my-java-app:latest
-                        '''
-                    } else {
-                        echo "Skipping Docker run stage"
+                    try {
+                        def proceed = input message: 'Do you want to run the Docker container?', parameters: [booleanParam(defaultValue: true, description: '', name: 'Proceed?')]
+                        if (proceed) {
+                            echo "Running Docker container"
+                            sh '''
+                                docker run -d -p 8000:8080 --name my-java-container my-java-app:latest
+                            '''
+                        } else {
+                            echo "Skipping Docker run stage"
+                        }
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                        echo "Input aborted, skipping Docker run stage"
                     }
                 }
             }
