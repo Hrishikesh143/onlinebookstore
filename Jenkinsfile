@@ -17,6 +17,23 @@ pipeline {
                 echo "Building with Maven"
                 sh 'mvn clean install'  // Runs the Maven build
             }
+        stage("docker_build") {
+            steps {
+                echo "Building Docker image"
+                // Build Docker image, tag it
+                sh 'docker build -t my-java-app:latest .'
+            }
+        stage("docker_run") {
+            steps {
+                echo "Running Docker container"
+                // Stop and remove any existing container with same name
+                sh '''
+                docker rm -f my-java-container || true
+                docker run -d -p 8080:8080 --name my-java-container my-java-app:latest
+                '''
+            }
+        }
+	}
         } 
         }
 }
