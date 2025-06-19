@@ -17,12 +17,14 @@ pipeline {
                 echo "Building with Maven"
                 sh 'mvn clean install'  // Runs the Maven build
             }
+  	   }
         stage("docker_build") {
             steps {
                 echo "Building Docker image"
                 // Build Docker image, tag it
                 sh 'docker build -t my-java-app:latest .'
             }
+ 	}
         stage("docker_run") {
             steps {
                 echo "Running Docker container"
@@ -34,6 +36,4 @@ pipeline {
             }
         }
 	}
-        } 
-        }
 }
