@@ -1,15 +1,14 @@
-# Use a base Java runtime image
-FROM eclipse-temurin:21-jre-alpine
+FROM tomcat:9.0-jdk11-openjdk
 
-# Set working directory inside the container
-WORKDIR /app
+# Remove default apps (optional)
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Copy the built jar from local into the container
-COPY target/onlinebookstore.war .
+# Copy WAR file into the webapps directory
+COPY target/onlinebookstore.war /usr/local/tomcat/webapps/onlinebookstore.war
 
-# Expose the port your app listens on (e.g., 8080)
+# Expose Tomcat port
 EXPOSE 8080
 
-# Run the jar
-ENTRYPOINT ["java", "-jar", "onlinebookstore.war"]
+# Start Tomcat server
+CMD ["catalina.sh", "run"]
 
