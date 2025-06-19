@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Copy the built jar from local into the container
-COPY target/myapp.jar app.jar
+COPY target/onlinebookstore.war .
 
 # Expose the port your app listens on (e.g., 8080)
 EXPOSE 8080
