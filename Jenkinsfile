@@ -56,7 +56,7 @@ pipeline {
         stage('Kubernetes') {
             steps {
                 sh '''
-		export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+		export KUBECONFIG=/var/lib/jenkins/rke2.yaml
                 kubectl apply -f k8s/namespace.yaml
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
